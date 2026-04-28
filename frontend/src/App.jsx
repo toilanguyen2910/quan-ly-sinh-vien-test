@@ -3,6 +3,8 @@ import Dashboard from './components/Dashboard';
 import StudentForm from './components/StudentForm';
 import StudentList from './components/StudentList';
 import { getStudents, createStudent, updateStudent, deleteStudent } from './api';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import './index.css';
 
 function App() {
@@ -15,7 +17,8 @@ function App() {
       const data = await getStudents();
       setStudents(data);
     } catch (error) {
-      console.error("Failed to fetch students", error);
+      toast.error("Không thể tải dữ liệu sinh viên!");
+      console.error(error);
     }
   };
 
@@ -29,13 +32,16 @@ function App() {
     try {
       if (editingStudent) {
         await updateStudent(editingStudent.id, studentData);
+        toast.success("Cập nhật sinh viên thành công!");
         setEditingStudent(null);
       } else {
         await createStudent(studentData);
+        toast.success("Đã thêm sinh viên mới!");
       }
       triggerUpdate();
     } catch (error) {
-      console.error("Failed to save student", error);
+      toast.error("Có lỗi xảy ra khi lưu!");
+      console.error(error);
     }
   };
 
@@ -43,9 +49,11 @@ function App() {
     if (window.confirm("Bạn có chắc chắn muốn xóa sinh viên này?")) {
       try {
         await deleteStudent(id);
+        toast.success("Đã xóa sinh viên!");
         triggerUpdate();
       } catch (error) {
-        console.error("Failed to delete student", error);
+        toast.error("Không thể xóa sinh viên này!");
+        console.error(error);
       }
     }
   };
@@ -57,13 +65,14 @@ function App() {
 
   return (
     <div className="app-container">
+      <ToastContainer position="top-right" theme="dark" />
       <header>
         <h1>Hệ Thống Quản Lý Sinh Viên</h1>
         <p>Phiên bản nâng cao với React và Node.js</p>
       </header>
 
       <main>
-        <Dashboard updateTrigger={updateTrigger} />
+        <Dashboard students={students} />
         
         <StudentForm 
           onSubmit={handleAddOrUpdate} 
