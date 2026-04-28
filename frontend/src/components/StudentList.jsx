@@ -37,7 +37,7 @@ const StudentList = ({ students, onEdit, onDelete }) => {
                   <td>{student.major}</td>
                   <td>
                     <span style={{ 
-                      color: student.gpa >= 8 ? 'var(--success)' : (student.gpa < 5 ? 'var(--danger)' : 'inherit'),
+                      color: student.gpa >= 3.2 ? 'var(--success)' : (student.gpa < 2.0 ? 'var(--danger)' : 'inherit'),
                       fontWeight: 'bold'
                     }}>
                       {student.gpa}

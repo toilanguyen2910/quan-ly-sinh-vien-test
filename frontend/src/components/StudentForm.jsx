@@ -60,8 +60,8 @@ const StudentForm = ({ onSubmit, editingStudent, onCancel }) => {
             <input required type="text" name="major" value={formData.major} onChange={handleChange} placeholder="Công nghệ thông tin" />
           </div>
           <div className="form-group">
-            <label>Điểm GPA</label>
-            <input required type="number" step="0.1" min="0" max="10" name="gpa" value={formData.gpa} onChange={handleChange} placeholder="8.5" />
+            <label>Điểm GPA (Hệ 4.0)</label>
+            <input required type="number" step="0.1" min="0" max="4" name="gpa" value={formData.gpa} onChange={handleChange} placeholder="3.5" />
           </div>
         </div>
         <div className="form-actions">
