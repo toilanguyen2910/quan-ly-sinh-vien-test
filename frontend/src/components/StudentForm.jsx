@@ -57,7 +57,23 @@ const StudentForm = ({ onSubmit, editingStudent, onCancel }) => {
           </div>
           <div className="form-group">
             <label>Chuyên Ngành</label>
-            <input required type="text" name="major" value={formData.major} onChange={handleChange} placeholder="Công nghệ thông tin" />
+            <select 
+              required 
+              name="major" 
+              value={formData.major} 
+              onChange={handleChange}
+              style={{ padding: '0.75rem 1rem', background: 'rgba(15, 23, 42, 0.5)', border: '1px solid var(--surface-border)', borderRadius: '8px', color: 'var(--text-main)', outline: 'none', fontFamily: 'inherit' }}
+            >
+              <option value="" disabled>-- Chọn chuyên ngành --</option>
+              <option value="Công nghệ thông tin">Công nghệ thông tin</option>
+              <option value="Kiến trúc máy tính">Kiến trúc máy tính</option>
+              <option value="Khoa học dữ liệu">Khoa học dữ liệu</option>
+              <option value="An toàn thông tin">An toàn thông tin</option>
+              <option value="Hệ thống thông tin">Hệ thống thông tin</option>
+              <option value="Trí tuệ nhân tạo">Trí tuệ nhân tạo</option>
+              <option value="Kỹ thuật phần mềm">Kỹ thuật phần mềm</option>
+              <option value="Mạng máy tính">Mạng máy tính</option>
+            </select>
           </div>
           <div className="form-group">
             <label>Điểm GPA (Hệ 4.0)</label>
