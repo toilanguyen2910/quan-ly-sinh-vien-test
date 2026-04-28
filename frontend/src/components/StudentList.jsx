@@ -30,6 +30,25 @@ const StudentList = ({ students, onEdit, onDelete }) => {
               </tr>
             </thead>
             <tbody>
+              {/* Sinh viên mẫu cố định */}
+              <tr style={{ background: 'rgba(255, 255, 255, 0.05)' }}>
+                <td><span className="badge" style={{ background: 'rgba(236, 72, 153, 0.1)', color: 'var(--secondary)' }}>VIP</span></td>
+                <td className="rainbow-text" style={{ fontSize: '1.2rem' }}>Bách Khoa</td>
+                <td style={{ fontWeight: 600 }}>CNTT</td>
+                <td>
+                  <span style={{ color: 'var(--success)', fontWeight: 'bold', fontSize: '1.2rem', textShadow: '0 0 10px rgba(16, 185, 129, 0.5)' }}>4.0</span>
+                </td>
+                <td>
+                  <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                    Ví dụ mẫu<br />Vĩnh viễn
+                  </div>
+                </td>
+                <td>
+                  <div className="actions-cell">
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontStyle: 'italic', padding: '0.5rem' }}>Bất tử 🛡️</span>
+                  </div>
+                </td>
+              </tr>
               {students.map((student) => (
                 <tr key={student.id}>
                   <td><span className="badge">{student.studentCode}</span></td>
