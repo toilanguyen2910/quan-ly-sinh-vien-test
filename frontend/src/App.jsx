@@ -162,56 +162,79 @@ function App() {
   };
 
   return (
-    <motion.div 
-      className="app-container"
-      initial="hidden"
-      animate="visible"
-      variants={containerVariants}
-    >
+    <div className="container">
       <ToastContainer position="top-right" theme={isDark ? 'dark' : 'light'} />
       
-      <motion.header variants={itemVariants}>
-        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <header style={{ marginBottom: '3rem', textAlign: 'center' }}>
+          <h1 className="title-gradient">Hệ Thống Quản Lý Sinh Viên</h1>
+          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', maxWidth: '600px', margin: '0 auto' }}>
+            Nền tảng quản trị dữ liệu sinh viên thông minh, hiện đại và bảo mật cao
+          </p>
+        </header>
+
+        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
           {user ? (
-            <div className="user-profile">
-              <span className="user-badge">Admin</span>
-              <button className="btn-icon" onClick={() => setShowActivityLog(true)} title="Nhật ký hoạt động">
-                <History size={20} />
-              </button>
-              <button className="btn-logout" onClick={handleLogout}>Đăng xuất</button>
-            </div>
+            <motion.div 
+              className="glass" 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              style={{ padding: '0.6rem 1.25rem', display: 'flex', alignItems: 'center', gap: '1.25rem' }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <div style={{ width: '36px', height: '36px', borderRadius: '12px', background: 'linear-gradient(135deg, var(--primary), var(--secondary))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold', boxShadow: '0 4px 12px rgba(99, 102, 241, 0.3)' }}>
+                  A
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <span style={{ fontWeight: 700, fontSize: '0.9rem', lineHeight: 1 }}>Quản trị viên</span>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Online</span>
+                </div>
+              </div>
+              <div style={{ width: '1px', height: '24px', background: 'var(--surface-border)' }}></div>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <button className="btn-icon" onClick={() => setShowActivityLog(true)} title="Nhật ký hoạt động">
+                  <History size={18} />
+                </button>
+                <button 
+                  onClick={handleLogout}
+                  style={{ background: 'transparent', border: 'none', color: 'var(--danger)', fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem', padding: '0.25rem 0.5rem' }}
+                >
+                  Đăng xuất
+                </button>
+              </div>
+            </motion.div>
           ) : (
-            <button className="btn-login" onClick={() => setShowLogin(true)}>Đăng nhập Admin</button>
+            <button className="btn btn-primary" onClick={() => setShowLogin(true)}>
+              Đăng nhập Admin
+            </button>
           )}
           <ThemeToggle isDark={isDark} onToggle={() => setIsDark(!isDark)} />
         </div>
-        <motion.h1 
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.5 }}
-        >
-          Hệ Thống Quản Lý Sinh Viên
-        </motion.h1>
-        <p>Phiên bản nâng cao với React và Node.js</p>
-      </motion.header>
+      </motion.div>
 
-      <motion.main variants={containerVariants}>
-        <motion.div variants={itemVariants}>
+      <AnimatePresence mode="wait">
+        <motion.main
+          key="main-content"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
           <Dashboard students={students} isLoading={isLoading} />
-        </motion.div>
-        
-        {user && (
-          <motion.div variants={itemVariants}>
+          
+          {user && (
             <StudentForm 
               onSubmit={handleAddOrUpdate} 
               editingStudent={editingStudent}
               onCancel={() => setEditingStudent(null)}
               onOpenImport={() => setShowImport(true)}
             />
-          </motion.div>
-        )}
-        
-        <motion.div variants={itemVariants}>
+          )}
+
           <StudentList 
             students={students} 
             onEdit={user ? handleEdit : null} 
@@ -220,10 +243,10 @@ function App() {
             isLoading={isLoading}
             isAdmin={!!user}
           />
-        </motion.div>
-      </motion.main>
+        </motion.main>
+      </AnimatePresence>
 
-      {/* Modals */}
+      {/* Modals & Overlays */}
       <AnimatePresence>
         {selectedStudent && (
           <StudentDetail student={selectedStudent} onClose={() => setSelectedStudent(null)} />
@@ -257,7 +280,7 @@ function App() {
           cancelText="Để sau"
         />
       </AnimatePresence>
-    </motion.div>
+    </div>
   );
 }
 
