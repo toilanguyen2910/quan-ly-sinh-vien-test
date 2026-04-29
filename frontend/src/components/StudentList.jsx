@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { Pencil, Trash2, Search, Download, ArrowUpDown } from 'lucide-react';
+import { Pencil, Trash2, Search, Download, ArrowUpDown, Eye } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
-const StudentList = ({ students, onEdit, onDelete }) => {
+const StudentList = ({ students, onEdit, onDelete, onViewDetail }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterMajor, setFilterMajor] = useState('All');
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
@@ -139,7 +139,7 @@ const StudentList = ({ students, onEdit, onDelete }) => {
               </tr>
             ) : (
               processedStudents.map((student) => (
-                <tr key={student.id}>
+                <tr key={student.id} className="clickable-row" onClick={() => onViewDetail && onViewDetail(student)}>
                   <td><span className="badge">{student.studentCode}</span></td>
                   <td style={{ fontWeight: 500 }}>{student.fullName}</td>
                   <td>{student.major}</td>
@@ -158,10 +158,13 @@ const StudentList = ({ students, onEdit, onDelete }) => {
                   </td>
                   <td>
                     <div className="actions-cell">
-                      <button className="btn-icon" onClick={() => onEdit(student)} title="Sửa">
+                      <button className="btn-icon" onClick={(e) => { e.stopPropagation(); onViewDetail && onViewDetail(student); }} title="Chi tiết">
+                        <Eye size={16} />
+                      </button>
+                      <button className="btn-icon" onClick={(e) => { e.stopPropagation(); onEdit(student); }} title="Sửa">
                         <Pencil size={16} />
                       </button>
-                      <button className="btn-icon danger" onClick={() => onDelete(student.id)} title="Xóa">
+                      <button className="btn-icon danger" onClick={(e) => { e.stopPropagation(); onDelete(student.id); }} title="Xóa">
                         <Trash2 size={16} />
                       </button>
                     </div>

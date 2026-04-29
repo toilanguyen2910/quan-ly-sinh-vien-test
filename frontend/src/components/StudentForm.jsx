@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Save, X } from 'lucide-react';
+import { Save, X, Upload } from 'lucide-react';
 
-const StudentForm = ({ onSubmit, editingStudent, onCancel }) => {
+const StudentForm = ({ onSubmit, editingStudent, onCancel, onOpenImport }) => {
   const [formData, setFormData] = useState({
     studentCode: '',
     fullName: '',
@@ -34,9 +34,16 @@ const StudentForm = ({ onSubmit, editingStudent, onCancel }) => {
 
   return (
     <div className="form-container glass">
-      <h2 className="form-title">
-        {editingStudent ? 'Cập Nhật Thông Tin Sinh Viên' : 'Thêm Sinh Viên Mới'}
-      </h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
+        <h2 className="form-title" style={{ margin: 0 }}>
+          {editingStudent ? 'Cập Nhật Thông Tin Sinh Viên' : 'Thêm Sinh Viên Mới'}
+        </h2>
+        {!editingStudent && onOpenImport && (
+          <button type="button" className="btn btn-secondary" onClick={onOpenImport} style={{ padding: '0.5rem 1rem' }}>
+            <Upload size={16} /> Import Excel
+          </button>
+        )}
+      </div>
       <form onSubmit={handleSubmit}>
         <div className="form-grid">
           <div className="form-group">

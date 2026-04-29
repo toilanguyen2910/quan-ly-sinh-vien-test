@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import Dashboard from './components/Dashboard';
 import StudentForm from './components/StudentForm';
 import StudentList from './components/StudentList';
+import StudentDetail from './components/StudentDetail';
+import ImportExcel from './components/ImportExcel';
+import ThemeToggle from './components/ThemeToggle';
 import { getStudents, createStudent, updateStudent, deleteStudent } from './api';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -11,6 +14,18 @@ function App() {
   const [students, setStudents] = useState([]);
   const [editingStudent, setEditingStudent] = useState(null);
   const [updateTrigger, setUpdateTrigger] = useState(0);
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [showImport, setShowImport] = useState(false);
+  const [isDark, setIsDark] = useState(() => {
+    const saved = localStorage.getItem('theme');
+    return saved ? saved === 'dark' : true;
+  });
+
+  // Apply theme
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  }, [isDark]);
 
   const fetchStudents = async () => {
     try {
@@ -45,6 +60,15 @@ function App() {
     }
   };
 
+  const handleImportStudent = async (studentData) => {
+    await createStudent(studentData);
+  };
+
+  const handleImportClose = () => {
+    setShowImport(false);
+    triggerUpdate();
+  };
+
   const handleDelete = async (id) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa sinh viên này?")) {
       try {
@@ -63,10 +87,17 @@ function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleViewDetail = (student) => {
+    setSelectedStudent(student);
+  };
+
   return (
     <div className="app-container">
-      <ToastContainer position="top-right" theme="dark" />
+      <ToastContainer position="top-right" theme={isDark ? 'dark' : 'light'} />
       <header>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
+          <ThemeToggle isDark={isDark} onToggle={() => setIsDark(!isDark)} />
+        </div>
         <h1>Hệ Thống Quản Lý Sinh Viên</h1>
         <p>Phiên bản nâng cao với React và Node.js</p>
       </header>
@@ -78,14 +109,24 @@ function App() {
           onSubmit={handleAddOrUpdate} 
           editingStudent={editingStudent}
           onCancel={() => setEditingStudent(null)}
+          onOpenImport={() => setShowImport(true)}
         />
         
         <StudentList 
           students={students} 
           onEdit={handleEdit} 
-          onDelete={handleDelete} 
+          onDelete={handleDelete}
+          onViewDetail={handleViewDetail}
         />
       </main>
+
+      {/* Modals */}
+      {selectedStudent && (
+        <StudentDetail student={selectedStudent} onClose={() => setSelectedStudent(null)} />
+      )}
+      {showImport && (
+        <ImportExcel onImport={handleImportStudent} onClose={handleImportClose} />
+      )}
     </div>
   );
 }
