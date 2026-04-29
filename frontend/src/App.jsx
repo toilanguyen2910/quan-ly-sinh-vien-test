@@ -75,18 +75,25 @@ function App() {
     triggerUpdate();
   };
 
-  const handleDelete = (id) => {
-    setConfirmDelete({ isOpen: true, studentId: id });
+  const handleDelete = (idOrIds) => {
+    setConfirmDelete({ isOpen: true, studentId: idOrIds });
   };
 
   const executeDelete = async () => {
-    const id = confirmDelete.studentId;
+    const idOrIds = confirmDelete.studentId;
     try {
-      await deleteStudent(id);
-      toast.success("Đã xóa sinh viên!");
+      if (Array.isArray(idOrIds)) {
+        // Xóa hàng loạt
+        await Promise.all(idOrIds.map(id => deleteStudent(id)));
+        toast.success(`Đã xóa ${idOrIds.length} sinh viên!`);
+      } else {
+        // Xóa đơn lẻ
+        await deleteStudent(idOrIds);
+        toast.success("Đã xóa sinh viên!");
+      }
       triggerUpdate();
     } catch (error) {
-      toast.error("Không thể xóa sinh viên này!");
+      toast.error("Có lỗi xảy ra khi xóa!");
       console.error(error);
     } finally {
       setConfirmDelete({ isOpen: false, studentId: null });
@@ -182,7 +189,10 @@ function App() {
         <ConfirmModal 
           isOpen={confirmDelete.isOpen}
           title="Xác nhận xóa"
-          message="Bạn có chắc chắn muốn xóa sinh viên này? Hành động này không thể hoàn tác."
+          message={Array.isArray(confirmDelete.studentId) 
+            ? `Bạn có chắc chắn muốn xóa ${confirmDelete.studentId.length} sinh viên đã chọn?` 
+            : "Bạn có chắc chắn muốn xóa sinh viên này? Hành động này không thể hoàn tác."
+          }
           onConfirm={executeDelete}
           onCancel={() => setConfirmDelete({ isOpen: false, studentId: null })}
           confirmText="Xóa ngay"

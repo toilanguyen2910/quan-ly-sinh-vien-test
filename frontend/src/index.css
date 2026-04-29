@@ -319,6 +319,15 @@ tbody tr:hover {
   background: rgba(99, 102, 241, 0.04) !important;
 }
 
+.selected-row {
+  background: rgba(99, 102, 241, 0.08) !important;
+}
+
+.selected-row td {
+  color: var(--primary);
+  font-weight: 500;
+}
+
 .badge {
   padding: 0.25rem 0.75rem;
   border-radius: 99px;

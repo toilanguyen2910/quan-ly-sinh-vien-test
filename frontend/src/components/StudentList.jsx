@@ -6,7 +6,9 @@ import * as XLSX from 'xlsx';
 const StudentList = ({ students, onEdit, onDelete, onViewDetail, isLoading }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterMajor, setFilterMajor] = useState('All');
+  const [filterGpa, setFilterGpa] = useState('All');
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+  const [selectedIds, setSelectedIds] = useState([]);
 
   // Lọc danh sách chuyên ngành duy nhất từ data hiện tại
   const majors = ['All', ...new Set(students.map(s => s.major).filter(Boolean))];
@@ -27,6 +29,14 @@ const StudentList = ({ students, onEdit, onDelete, onViewDetail, isLoading }) =>
     // 2. Lọc theo chuyên ngành
     if (filterMajor !== 'All') {
       result = result.filter(s => s.major === filterMajor);
+    }
+
+    // 2.5 Lọc theo GPA
+    if (filterGpa !== 'All') {
+      if (filterGpa === 'high') result = result.filter(s => parseFloat(s.gpa) >= 3.6);
+      else if (filterGpa === 'good') result = result.filter(s => parseFloat(s.gpa) >= 3.2 && parseFloat(s.gpa) < 3.6);
+      else if (filterGpa === 'average') result = result.filter(s => parseFloat(s.gpa) >= 2.5 && parseFloat(s.gpa) < 3.2);
+      else if (filterGpa === 'low') result = result.filter(s => parseFloat(s.gpa) < 2.5);
     }
 
     // 3. Sắp xếp
@@ -51,6 +61,23 @@ const StudentList = ({ students, onEdit, onDelete, onViewDetail, isLoading }) =>
       direction = 'desc';
     }
     setSortConfig({ key, direction });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.length === processedStudents.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(processedStudents.map(s => s.id));
+    }
+  };
+
+  const toggleSelect = (e, id) => {
+    e.stopPropagation();
+    if (selectedIds.includes(id)) {
+      setSelectedIds(selectedIds.filter(i => i !== id));
+    } else {
+      setSelectedIds([...selectedIds, id]);
+    }
   };
 
   const handleExport = () => {
@@ -110,9 +137,32 @@ const StudentList = ({ students, onEdit, onDelete, onViewDetail, isLoading }) =>
             {majors.map(m => <option key={m} value={m}>{m === 'All' ? 'Tất cả ngành' : m}</option>)}
           </select>
 
-          <button onClick={handleExport} className="btn btn-primary" style={{ padding: '0.5rem 1rem' }}>
-            <Download size={18} /> Xuất Excel
-          </button>
+          <select 
+            value={filterGpa} 
+            onChange={(e) => setFilterGpa(e.target.value)}
+            style={{ padding: '0.5rem 1rem', background: 'var(--input-bg)', border: '1px solid var(--surface-border)', borderRadius: '8px', color: 'var(--text-main)', outline: 'none' }}
+          >
+            <option value="All">Mọi điểm số</option>
+            <option value="high">Xuất sắc (>= 3.6)</option>
+            <option value="good">Giỏi (3.2 - 3.59)</option>
+            <option value="average">Khá (2.5 - 3.19)</option>
+            <option value="low">Cần lưu ý (< 2.5)</option>
+          </select>
+
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            {selectedIds.length > 0 && (
+              <button 
+                onClick={() => onDelete(selectedIds)} 
+                className="btn btn-primary" 
+                style={{ background: 'var(--danger)', padding: '0.5rem 1rem' }}
+              >
+                <Trash2 size={18} /> Xóa ({selectedIds.length})
+              </button>
+            )}
+            <button onClick={handleExport} className="btn btn-primary" style={{ padding: '0.5rem 1rem' }}>
+              <Download size={18} /> Xuất Excel
+            </button>
+          </div>
         </div>
       </div>
 
@@ -120,6 +170,14 @@ const StudentList = ({ students, onEdit, onDelete, onViewDetail, isLoading }) =>
         <table>
           <thead>
             <tr>
+              <th style={{ width: '40px' }}>
+                <input 
+                  type="checkbox" 
+                  checked={processedStudents.length > 0 && selectedIds.length === processedStudents.length}
+                  onChange={toggleSelectAll}
+                  style={{ cursor: 'pointer' }}
+                />
+              </th>
               <th onClick={() => requestSort('studentCode')} style={{ cursor: 'pointer' }}>Mã SV <ArrowUpDown size={14} style={{display:'inline', verticalAlign:'middle'}}/></th>
               <th onClick={() => requestSort('fullName')} style={{ cursor: 'pointer' }}>Họ và Tên <ArrowUpDown size={14} style={{display:'inline', verticalAlign:'middle'}}/></th>
               <th onClick={() => requestSort('major')} style={{ cursor: 'pointer' }}>Chuyên Ngành <ArrowUpDown size={14} style={{display:'inline', verticalAlign:'middle'}}/></th>
@@ -149,9 +207,18 @@ const StudentList = ({ students, onEdit, onDelete, onViewDetail, isLoading }) =>
                     initial="hidden"
                     animate="visible"
                     exit="exit"
-                    className="clickable-row" 
+                    className={`clickable-row ${selectedIds.includes(student.id) ? 'selected-row' : ''}`} 
                     onClick={() => onViewDetail && onViewDetail(student)}
                   >
+                    <td>
+                      <input 
+                        type="checkbox" 
+                        checked={selectedIds.includes(student.id)}
+                        onChange={(e) => toggleSelect(e, student.id)}
+                        onClick={(e) => e.stopPropagation()}
+                        style={{ cursor: 'pointer' }}
+                      />
+                    </td>
                     <td><span className="badge">{student.studentCode}</span></td>
                     <td style={{ fontWeight: 500 }}>{student.fullName}</td>
                     <td>{student.major}</td>
