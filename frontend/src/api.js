@@ -63,3 +63,12 @@ export const deleteStudent = async (id) => {
   });
   return response.json();
 };
+
+export const getActivityLogs = async () => {
+  const response = await fetch(`${API_URL}/logs`, {
+    headers: {
+      ...getAuthHeader()
+    }
+  });
+  return response.json();
+};

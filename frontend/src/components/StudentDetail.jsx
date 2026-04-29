@@ -1,8 +1,11 @@
-import React from 'react';
-import { X, Mail, Phone, GraduationCap, Hash, Award, BookOpen } from 'lucide-react';
+import { X, Mail, Phone, GraduationCap, Hash, Award, BookOpen, Printer } from 'lucide-react';
 
 const StudentDetail = ({ student, onClose }) => {
   if (!student) return null;
+
+  const handlePrint = () => {
+    window.print();
+  };
 
   const gpaLevel = student.gpa >= 3.6 ? 'Xuất sắc' : student.gpa >= 3.2 ? 'Giỏi' : student.gpa >= 2.5 ? 'Khá' : student.gpa >= 2.0 ? 'Trung bình' : 'Yếu';
   const gpaColor = student.gpa >= 3.2 ? 'var(--success)' : student.gpa >= 2.0 ? 'var(--warning, #f59e0b)' : 'var(--danger)';
@@ -22,9 +25,14 @@ const StudentDetail = ({ student, onClose }) => {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content glass student-detail-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '520px', width: '90%' }}>
-        <button className="btn-icon modal-close-btn" onClick={onClose} style={{ position: 'absolute', top: '1rem', right: '1rem', zIndex: 10 }}>
-          <X size={20} />
-        </button>
+        <div className="no-print" style={{ position: 'absolute', top: '1rem', right: '1rem', zIndex: 10, display: 'flex', gap: '0.5rem' }}>
+          <button className="btn-icon" onClick={handlePrint} title="In hồ sơ">
+            <Printer size={20} />
+          </button>
+          <button className="btn-icon" onClick={onClose}>
+            <X size={20} />
+          </button>
+        </div>
 
         {/* Profile Header */}
         <div className="detail-header">

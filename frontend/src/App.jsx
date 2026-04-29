@@ -8,8 +8,10 @@ import ImportExcel from './components/ImportExcel';
 import ConfirmModal from './components/ConfirmModal';
 import ThemeToggle from './components/ThemeToggle';
 import Login from './components/Login';
+import ActivityLog from './components/ActivityLog';
 import { getStudents, createStudent, updateStudent, deleteStudent } from './api';
 import { ToastContainer, toast } from 'react-toastify';
+import { History } from 'lucide-react';
 import 'react-toastify/dist/ReactToastify.css';
 import './index.css';
 
@@ -21,6 +23,7 @@ function App() {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [showImport, setShowImport] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
+  const [showActivityLog, setShowActivityLog] = useState(false);
   const [user, setUser] = useState(() => {
     const saved = localStorage.getItem('adminUser');
     return saved ? JSON.parse(saved) : null;
@@ -172,6 +175,9 @@ function App() {
           {user ? (
             <div className="user-profile">
               <span className="user-badge">Admin</span>
+              <button className="btn-icon" onClick={() => setShowActivityLog(true)} title="Nhật ký hoạt động">
+                <History size={20} />
+              </button>
               <button className="btn-logout" onClick={handleLogout}>Đăng xuất</button>
             </div>
           ) : (
@@ -230,6 +236,12 @@ function App() {
             isOpen={showLogin} 
             onClose={() => setShowLogin(false)} 
             onLoginSuccess={(userData) => setUser(userData)} 
+          />
+        )}
+        {showActivityLog && (
+          <ActivityLog 
+            isOpen={showActivityLog} 
+            onClose={() => setShowActivityLog(false)} 
           />
         )}
         <ConfirmModal 
