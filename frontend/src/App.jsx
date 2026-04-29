@@ -5,6 +5,7 @@ import StudentForm from './components/StudentForm';
 import StudentList from './components/StudentList';
 import StudentDetail from './components/StudentDetail';
 import ImportExcel from './components/ImportExcel';
+import ConfirmModal from './components/ConfirmModal';
 import ThemeToggle from './components/ThemeToggle';
 import { getStudents, createStudent, updateStudent, deleteStudent } from './api';
 import { ToastContainer, toast } from 'react-toastify';
@@ -22,6 +23,7 @@ function App() {
     const saved = localStorage.getItem('theme');
     return saved ? saved === 'dark' : true;
   });
+  const [confirmDelete, setConfirmDelete] = useState({ isOpen: false, studentId: null });
 
   // Apply theme
   useEffect(() => {
@@ -73,16 +75,21 @@ function App() {
     triggerUpdate();
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa sinh viên này?")) {
-      try {
-        await deleteStudent(id);
-        toast.success("Đã xóa sinh viên!");
-        triggerUpdate();
-      } catch (error) {
-        toast.error("Không thể xóa sinh viên này!");
-        console.error(error);
-      }
+  const handleDelete = (id) => {
+    setConfirmDelete({ isOpen: true, studentId: id });
+  };
+
+  const executeDelete = async () => {
+    const id = confirmDelete.studentId;
+    try {
+      await deleteStudent(id);
+      toast.success("Đã xóa sinh viên!");
+      triggerUpdate();
+    } catch (error) {
+      toast.error("Không thể xóa sinh viên này!");
+      console.error(error);
+    } finally {
+      setConfirmDelete({ isOpen: false, studentId: null });
     }
   };
 
@@ -172,6 +179,15 @@ function App() {
         {showImport && (
           <ImportExcel onImport={handleImportStudent} onClose={handleImportClose} />
         )}
+        <ConfirmModal 
+          isOpen={confirmDelete.isOpen}
+          title="Xác nhận xóa"
+          message="Bạn có chắc chắn muốn xóa sinh viên này? Hành động này không thể hoàn tác."
+          onConfirm={executeDelete}
+          onCancel={() => setConfirmDelete({ isOpen: false, studentId: null })}
+          confirmText="Xóa ngay"
+          cancelText="Để sau"
+        />
       </AnimatePresence>
     </motion.div>
   );
