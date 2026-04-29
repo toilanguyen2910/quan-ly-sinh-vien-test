@@ -195,13 +195,29 @@ function App() {
                 </div>
               </div>
               <div style={{ width: '1px', height: '24px', background: 'var(--surface-border)' }}></div>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <button className="btn-icon" onClick={() => setShowActivityLog(true)} title="Nhật ký hoạt động">
-                  <History size={18} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <button 
+                  className="btn-icon" 
+                  onClick={() => setShowActivityLog(true)} 
+                  title="Nhật ký hoạt động"
+                  style={{ background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(236, 72, 153, 0.1))' }}
+                >
+                  <History size={18} style={{ color: 'var(--primary)' }} />
                 </button>
                 <button 
                   onClick={handleLogout}
-                  style={{ background: 'transparent', border: 'none', color: 'var(--danger)', fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem', padding: '0.25rem 0.5rem' }}
+                  className="btn-logout"
+                  style={{ 
+                    background: 'rgba(239, 68, 68, 0.1)', 
+                    border: '1px solid rgba(239, 68, 68, 0.2)', 
+                    color: 'var(--danger)', 
+                    fontWeight: 700, 
+                    cursor: 'pointer', 
+                    fontSize: '0.85rem', 
+                    padding: '0.5rem 1rem',
+                    borderRadius: '12px',
+                    transition: 'all 0.2s ease'
+                  }}
                 >
                   Đăng xuất
                 </button>
