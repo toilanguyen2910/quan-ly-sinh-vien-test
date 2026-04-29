@@ -1,28 +1,16 @@
-const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
+require('dotenv').config();
+const { createClient } = require('@supabase/supabase-js');
 
-const dbPath = path.resolve(__dirname, 'database.sqlite');
-const db = new sqlite3.Database(dbPath, (err) => {
-  if (err) {
-    console.error('Error connecting to database:', err.message);
-  } else {
-    console.log('Connected to the SQLite database.');
-    db.run(`CREATE TABLE IF NOT EXISTS students (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      studentCode TEXT UNIQUE NOT NULL,
-      fullName TEXT NOT NULL,
-      email TEXT,
-      phone TEXT,
-      major TEXT,
-      gpa REAL
-    )`, (err) => {
-      if (err) {
-        console.error('Error creating table:', err.message);
-      } else {
-        console.log('Students table ready.');
-      }
-    });
-  }
-});
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
 
-module.exports = db;
+if (!supabaseUrl || !supabaseKey) {
+  console.error('Lỗi: Cần có SUPABASE_URL và SUPABASE_KEY trong file .env');
+  process.exit(1);
+}
+
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+console.log('🔗 Đã kết nối thành công tới Supabase Database.');
+
+module.exports = supabase;

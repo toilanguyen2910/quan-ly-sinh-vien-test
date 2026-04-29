@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const db = require('./database');
+const supabase = require('./database');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -9,72 +9,82 @@ app.use(cors());
 app.use(express.json());
 
 // API: Lấy danh sách tất cả sinh viên
-app.get('/api/students', (req, res) => {
-  db.all('SELECT * FROM students', [], (err, rows) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.json(rows);
-  });
+app.get('/api/students', async (req, res) => {
+  const { data, error } = await supabase
+    .from('students')
+    .select('*')
+    .order('id', { ascending: false });
+
+  if (error) {
+    return res.status(500).json({ error: error.message });
+  }
+  res.json(data);
 });
 
 // API: Thêm sinh viên mới
-app.post('/api/students', (req, res) => {
+app.post('/api/students', async (req, res) => {
   const { studentCode, fullName, email, phone, major, gpa } = req.body;
-  const sql = 'INSERT INTO students (studentCode, fullName, email, phone, major, gpa) VALUES (?, ?, ?, ?, ?, ?)';
-  const params = [studentCode, fullName, email, phone, major, gpa];
   
-  db.run(sql, params, function(err) {
-    if (err) {
-      res.status(400).json({ error: err.message });
-      return;
-    }
-    res.status(201).json({
-      id: this.lastID,
-      studentCode, fullName, email, phone, major, gpa
-    });
-  });
+  const { data, error } = await supabase
+    .from('students')
+    .insert([{ studentCode, fullName, email, phone, major, gpa }])
+    .select()
+    .single();
+  
+  if (error) {
+    return res.status(400).json({ error: error.message });
+  }
+  res.status(201).json(data);
 });
 
 // API: Sửa thông tin sinh viên
-app.put('/api/students/:id', (req, res) => {
+app.put('/api/students/:id', async (req, res) => {
   const { studentCode, fullName, email, phone, major, gpa } = req.body;
-  const sql = 'UPDATE students SET studentCode = ?, fullName = ?, email = ?, phone = ?, major = ?, gpa = ? WHERE id = ?';
-  const params = [studentCode, fullName, email, phone, major, gpa, req.params.id];
   
-  db.run(sql, params, function(err) {
-    if (err) {
-      res.status(400).json({ error: err.message });
-      return;
-    }
-    res.json({ message: 'Student updated', changes: this.changes });
-  });
+  const { data, error } = await supabase
+    .from('students')
+    .update({ studentCode, fullName, email, phone, major, gpa })
+    .eq('id', req.params.id)
+    .select();
+  
+  if (error) {
+    return res.status(400).json({ error: error.message });
+  }
+  res.json({ message: 'Student updated', changes: data ? data.length : 0 });
 });
 
 // API: Xóa sinh viên
-app.delete('/api/students/:id', (req, res) => {
-  const sql = 'DELETE FROM students WHERE id = ?';
-  db.run(sql, req.params.id, function(err) {
-    if (err) {
-      res.status(400).json({ error: err.message });
-      return;
-    }
-    res.json({ message: 'Student deleted', changes: this.changes });
-  });
+app.delete('/api/students/:id', async (req, res) => {
+  const { data, error } = await supabase
+    .from('students')
+    .delete()
+    .eq('id', req.params.id)
+    .select();
+    
+  if (error) {
+    return res.status(400).json({ error: error.message });
+  }
+  res.json({ message: 'Student deleted', changes: data ? data.length : 0 });
 });
 
 // API: Thống kê cơ bản
-app.get('/api/stats', (req, res) => {
-  db.get('SELECT COUNT(*) as totalStudents, AVG(gpa) as averageGpa FROM students', [], (err, row) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.json(row);
-  });
+app.get('/api/stats', async (req, res) => {
+  const { data, error } = await supabase
+    .from('students')
+    .select('gpa');
+    
+  if (error) {
+    return res.status(500).json({ error: error.message });
+  }
+  
+  const totalStudents = data.length;
+  const averageGpa = totalStudents > 0 
+    ? data.reduce((sum, s) => sum + (parseFloat(s.gpa) || 0), 0) / totalStudents 
+    : 0;
+    
+  res.json({ totalStudents, averageGpa });
 });
 
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`🚀 Server is running on http://localhost:${PORT}`);
 });
