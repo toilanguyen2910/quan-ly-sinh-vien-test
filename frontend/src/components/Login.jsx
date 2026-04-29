@@ -4,8 +4,8 @@ import { login } from '../api';
 import { toast } from 'react-toastify';
 
 const Login = ({ isOpen, onClose, onLoginSuccess }) => {
-  const [username, setUsername] = useState('admin');
-  const [password, setPassword] = useState('admin29102007');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e) => {
