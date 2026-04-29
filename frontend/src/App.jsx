@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Dashboard from './components/Dashboard';
 import StudentForm from './components/StudentForm';
 import StudentList from './components/StudentList';
@@ -12,6 +13,7 @@ import './index.css';
 
 function App() {
   const [students, setStudents] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [editingStudent, setEditingStudent] = useState(null);
   const [updateTrigger, setUpdateTrigger] = useState(0);
   const [selectedStudent, setSelectedStudent] = useState(null);
@@ -34,6 +36,8 @@ function App() {
     } catch (error) {
       toast.error("Không thể tải dữ liệu sinh viên!");
       console.error(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -91,43 +95,85 @@ function App() {
     setSelectedStudent(student);
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 100
+      }
+    }
+  };
+
   return (
-    <div className="app-container">
+    <motion.div 
+      className="app-container"
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+    >
       <ToastContainer position="top-right" theme={isDark ? 'dark' : 'light'} />
-      <header>
+      <motion.header variants={itemVariants}>
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
           <ThemeToggle isDark={isDark} onToggle={() => setIsDark(!isDark)} />
         </div>
-        <h1>Hệ Thống Quản Lý Sinh Viên</h1>
+        <motion.h1 
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          Hệ Thống Quản Lý Sinh Viên
+        </motion.h1>
         <p>Phiên bản nâng cao với React và Node.js</p>
-      </header>
+      </motion.header>
 
-      <main>
-        <Dashboard students={students} />
+      <motion.main variants={containerVariants}>
+        <motion.div variants={itemVariants}>
+          <Dashboard students={students} isLoading={isLoading} />
+        </motion.div>
         
-        <StudentForm 
-          onSubmit={handleAddOrUpdate} 
-          editingStudent={editingStudent}
-          onCancel={() => setEditingStudent(null)}
-          onOpenImport={() => setShowImport(true)}
-        />
+        <motion.div variants={itemVariants}>
+          <StudentForm 
+            onSubmit={handleAddOrUpdate} 
+            editingStudent={editingStudent}
+            onCancel={() => setEditingStudent(null)}
+            onOpenImport={() => setShowImport(true)}
+          />
+        </motion.div>
         
-        <StudentList 
-          students={students} 
-          onEdit={handleEdit} 
-          onDelete={handleDelete}
-          onViewDetail={handleViewDetail}
-        />
-      </main>
+        <motion.div variants={itemVariants}>
+          <StudentList 
+            students={students} 
+            onEdit={handleEdit} 
+            onDelete={handleDelete}
+            onViewDetail={handleViewDetail}
+            isLoading={isLoading}
+          />
+        </motion.div>
+      </motion.main>
 
       {/* Modals */}
-      {selectedStudent && (
-        <StudentDetail student={selectedStudent} onClose={() => setSelectedStudent(null)} />
-      )}
-      {showImport && (
-        <ImportExcel onImport={handleImportStudent} onClose={handleImportClose} />
-      )}
-    </div>
+      <AnimatePresence>
+        {selectedStudent && (
+          <StudentDetail student={selectedStudent} onClose={() => setSelectedStudent(null)} />
+        )}
+        {showImport && (
+          <ImportExcel onImport={handleImportStudent} onClose={handleImportClose} />
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }
 

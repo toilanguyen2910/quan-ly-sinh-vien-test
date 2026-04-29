@@ -1,8 +1,9 @@
 import React, { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Pencil, Trash2, Search, Download, ArrowUpDown, Eye } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
-const StudentList = ({ students, onEdit, onDelete, onViewDetail }) => {
+const StudentList = ({ students, onEdit, onDelete, onViewDetail, isLoading }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterMajor, setFilterMajor] = useState('All');
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
@@ -18,8 +19,8 @@ const StudentList = ({ students, onEdit, onDelete, onViewDetail }) => {
     if (searchTerm) {
       const lowerSearch = searchTerm.toLowerCase();
       result = result.filter(
-        s => s.fullName.toLowerCase().includes(lowerSearch) || 
-             s.studentCode.toLowerCase().includes(lowerSearch)
+        s => (s.fullName || '').toLowerCase().includes(lowerSearch) || 
+             (s.studentCode || '').toLowerCase().includes(lowerSearch)
       );
     }
 
@@ -53,7 +54,6 @@ const StudentList = ({ students, onEdit, onDelete, onViewDetail }) => {
   };
 
   const handleExport = () => {
-    // Chuẩn bị dữ liệu để xuất
     const exportData = processedStudents.map(s => ({
       'Mã SV': s.studentCode,
       'Họ Tên': s.fullName,
@@ -68,13 +68,30 @@ const StudentList = ({ students, onEdit, onDelete, onViewDetail }) => {
     XLSX.writeFile(workbook, "Danh_Sach_Sinh_Vien.xlsx");
   };
 
+  const tableRowVariants = {
+    hidden: { opacity: 0, x: -10 },
+    visible: { opacity: 1, x: 0 },
+    exit: { opacity: 0, x: 10, transition: { duration: 0.2 } }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="glass" style={{ padding: '2rem' }}>
+        <div className="skeleton" style={{ height: '40px', width: '200px', marginBottom: '2rem' }}></div>
+        {[1, 2, 3, 4, 5].map(i => (
+          <div key={i} className="skeleton" style={{ height: '60px', marginBottom: '1rem' }}></div>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="glass" style={{ padding: '2rem' }}>
       <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', gap: '1rem' }}>
         <h2 className="form-title" style={{ margin: 0 }}>Danh Sách Sinh Viên</h2>
         
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-          <div className="form-group" style={{ flexDirection: 'row', alignItems: 'center', background: 'rgba(15, 23, 42, 0.5)', padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid var(--surface-border)' }}>
+          <div className="form-group" style={{ flexDirection: 'row', alignItems: 'center', background: 'var(--input-bg)', padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid var(--surface-border)' }}>
             <Search size={18} style={{ color: 'var(--text-muted)' }} />
             <input 
               type="text" 
@@ -88,7 +105,7 @@ const StudentList = ({ students, onEdit, onDelete, onViewDetail }) => {
           <select 
             value={filterMajor} 
             onChange={(e) => setFilterMajor(e.target.value)}
-            style={{ padding: '0.5rem 1rem', background: 'rgba(15, 23, 42, 0.5)', border: '1px solid var(--surface-border)', borderRadius: '8px', color: 'white', outline: 'none' }}
+            style={{ padding: '0.5rem 1rem', background: 'var(--input-bg)', border: '1px solid var(--surface-border)', borderRadius: '8px', color: 'var(--text-main)', outline: 'none' }}
           >
             {majors.map(m => <option key={m} value={m}>{m === 'All' ? 'Tất cả ngành' : m}</option>)}
           </select>
@@ -112,66 +129,62 @@ const StudentList = ({ students, onEdit, onDelete, onViewDetail }) => {
             </tr>
           </thead>
           <tbody>
-            {/* Sinh viên mẫu cố định */}
-            <tr style={{ background: 'rgba(255, 255, 255, 0.05)' }}>
-              <td><span className="badge" style={{ background: 'rgba(236, 72, 153, 0.1)', color: 'var(--secondary)' }}>VIP</span></td>
-              <td className="rainbow-text" style={{ fontSize: '1.2rem' }}>Bách Khoa</td>
-              <td style={{ fontWeight: 600 }}>CNTT</td>
-              <td>
-                <span style={{ color: 'var(--success)', fontWeight: 'bold', fontSize: '1.2rem', textShadow: '0 0 10px rgba(16, 185, 129, 0.5)' }}>4.0</span>
-              </td>
-              <td>
-                <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                  Ví dụ mẫu<br />Vĩnh viễn
-                </div>
-              </td>
-              <td>
-                <div className="actions-cell">
-                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontStyle: 'italic', padding: '0.5rem' }}>Bất tử 🛡️</span>
-                </div>
-              </td>
-            </tr>
-            {processedStudents.length === 0 ? (
-              <tr>
-                <td colSpan="6" style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
-                  Không tìm thấy sinh viên nào.
-                </td>
-              </tr>
-            ) : (
-              processedStudents.map((student) => (
-                <tr key={student.id} className="clickable-row" onClick={() => onViewDetail && onViewDetail(student)}>
-                  <td><span className="badge">{student.studentCode}</span></td>
-                  <td style={{ fontWeight: 500 }}>{student.fullName}</td>
-                  <td>{student.major}</td>
-                  <td>
-                    <span style={{ 
-                      color: student.gpa >= 3.2 ? 'var(--success)' : (student.gpa < 2.0 ? 'var(--danger)' : 'inherit'),
-                      fontWeight: 'bold'
-                    }}>
-                      {student.gpa}
-                    </span>
+            <AnimatePresence mode="popLayout">
+              {processedStudents.length === 0 ? (
+                <motion.tr 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  key="empty"
+                >
+                  <td colSpan="6" style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
+                    Không tìm thấy sinh viên nào.
                   </td>
-                  <td>
-                    <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                      {student.email}<br />{student.phone}
-                    </div>
-                  </td>
-                  <td>
-                    <div className="actions-cell">
-                      <button className="btn-icon" onClick={(e) => { e.stopPropagation(); onViewDetail && onViewDetail(student); }} title="Chi tiết">
-                        <Eye size={16} />
-                      </button>
-                      <button className="btn-icon" onClick={(e) => { e.stopPropagation(); onEdit(student); }} title="Sửa">
-                        <Pencil size={16} />
-                      </button>
-                      <button className="btn-icon danger" onClick={(e) => { e.stopPropagation(); onDelete(student.id); }} title="Xóa">
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
+                </motion.tr>
+              ) : (
+                processedStudents.map((student) => (
+                  <motion.tr 
+                    key={student.id} 
+                    layout
+                    variants={tableRowVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    className="clickable-row" 
+                    onClick={() => onViewDetail && onViewDetail(student)}
+                  >
+                    <td><span className="badge">{student.studentCode}</span></td>
+                    <td style={{ fontWeight: 500 }}>{student.fullName}</td>
+                    <td>{student.major}</td>
+                    <td>
+                      <span style={{ 
+                        color: student.gpa >= 3.2 ? 'var(--success)' : (student.gpa < 2.0 ? 'var(--danger)' : 'inherit'),
+                        fontWeight: 'bold'
+                      }}>
+                        {student.gpa}
+                      </span>
+                    </td>
+                    <td>
+                      <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                        {student.email}<br />{student.phone}
+                      </div>
+                    </td>
+                    <td>
+                      <div className="actions-cell">
+                        <button className="btn-icon" onClick={(e) => { e.stopPropagation(); onViewDetail && onViewDetail(student); }} title="Chi tiết">
+                          <Eye size={16} />
+                        </button>
+                        <button className="btn-icon" onClick={(e) => { e.stopPropagation(); onEdit(student); }} title="Sửa">
+                          <Pencil size={16} />
+                        </button>
+                        <button className="btn-icon danger" onClick={(e) => { e.stopPropagation(); onDelete(student.id); }} title="Xóa">
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </motion.tr>
+                ))
+              )}
+            </AnimatePresence>
           </tbody>
         </table>
       </div>

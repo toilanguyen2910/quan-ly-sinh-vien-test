@@ -1,8 +1,9 @@
 import React, { useMemo } from 'react';
+import { motion } from 'framer-motion';
 import { Users, GraduationCap, Award } from 'lucide-react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
-const Dashboard = ({ students }) => {
+const Dashboard = ({ students, isLoading }) => {
   const stats = useMemo(() => {
     const totalStudents = students.length;
     const averageGpa = totalStudents > 0 
@@ -19,8 +20,9 @@ const Dashboard = ({ students }) => {
     // Phân khúc điểm cho BarChart
     const gpaBands = { 'Giỏi (>=3.2)': 0, 'Khá (2.5 - 3.19)': 0, 'TB (<2.5)': 0 };
     students.forEach(s => {
-      if (s.gpa >= 3.2) gpaBands['Giỏi (>=3.2)']++;
-      else if (s.gpa >= 2.5) gpaBands['Khá (2.5 - 3.19)']++;
+      const gpa = parseFloat(s.gpa);
+      if (gpa >= 3.2) gpaBands['Giỏi (>=3.2)']++;
+      else if (gpa >= 2.5) gpaBands['Khá (2.5 - 3.19)']++;
       else gpaBands['TB (<2.5)']++;
     });
     const gpaData = Object.keys(gpaBands).map(key => ({ name: key, count: gpaBands[key] }));
@@ -30,10 +32,53 @@ const Dashboard = ({ students }) => {
 
   const COLORS = ['#6366f1', '#ec4899', '#10b981', '#f59e0b', '#8b5cf6'];
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const cardVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 100
+      }
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div style={{ marginBottom: '3rem' }}>
+        <div className="dashboard">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="stat-card glass skeleton" style={{ height: '100px' }}></div>
+          ))}
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
+          <div className="glass skeleton" style={{ height: '300px' }}></div>
+          <div className="glass skeleton" style={{ height: '300px' }}></div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div style={{ marginBottom: '3rem' }}>
+    <motion.div 
+      style={{ marginBottom: '3rem' }}
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+    >
       <div className="dashboard">
-        <div className="stat-card glass">
+        <motion.div className="stat-card glass" variants={cardVariants} whileHover={{ y: -5 }}>
           <div className="stat-icon primary">
             <Users size={24} />
           </div>
@@ -41,9 +86,9 @@ const Dashboard = ({ students }) => {
             <h3>Tổng Sinh Viên</h3>
             <p>{stats.totalStudents}</p>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="stat-card glass">
+        <motion.div className="stat-card glass" variants={cardVariants} whileHover={{ y: -5 }}>
           <div className="stat-icon secondary">
             <GraduationCap size={24} />
           </div>
@@ -51,9 +96,9 @@ const Dashboard = ({ students }) => {
             <h3>Chuyên Ngành</h3>
             <p>{stats.majorData.length}</p>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="stat-card glass">
+        <motion.div className="stat-card glass" variants={cardVariants} whileHover={{ y: -5 }}>
           <div className="stat-icon success">
             <Award size={24} />
           </div>
@@ -61,11 +106,11 @@ const Dashboard = ({ students }) => {
             <h3>GPA Trung Bình</h3>
             <p>{stats.averageGpa ? stats.averageGpa.toFixed(2) : '0.00'}</p>
           </div>
-        </div>
+        </motion.div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
-        <div className="glass" style={{ padding: '1.5rem', height: '300px' }}>
+        <motion.div className="glass" variants={cardVariants} style={{ padding: '1.5rem', height: '300px' }}>
           <h3 style={{ marginBottom: '1rem', fontSize: '1.1rem', color: 'var(--text-muted)' }}>Tỷ Lệ Chuyên Ngành</h3>
           {stats.majorData.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
@@ -81,9 +126,9 @@ const Dashboard = ({ students }) => {
           ) : (
             <p style={{ color: 'var(--text-muted)' }}>Chưa có dữ liệu</p>
           )}
-        </div>
+        </motion.div>
 
-        <div className="glass" style={{ padding: '1.5rem', height: '300px' }}>
+        <motion.div className="glass" variants={cardVariants} style={{ padding: '1.5rem', height: '300px' }}>
           <h3 style={{ marginBottom: '1rem', fontSize: '1.1rem', color: 'var(--text-muted)' }}>Phổ Điểm GPA</h3>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={stats.gpaData}>
@@ -93,9 +138,9 @@ const Dashboard = ({ students }) => {
               <Bar dataKey="count" fill="#6366f1" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

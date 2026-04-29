@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { Save, X, Upload } from 'lucide-react';
 
 const StudentForm = ({ onSubmit, editingStudent, onCancel, onOpenImport }) => {
@@ -33,7 +34,12 @@ const StudentForm = ({ onSubmit, editingStudent, onCancel, onOpenImport }) => {
   };
 
   return (
-    <div className="form-container glass">
+    <motion.div 
+      className="form-container glass"
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.3 }}
+    >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
         <h2 className="form-title" style={{ margin: 0 }}>
           {editingStudent ? 'Cập Nhật Thông Tin Sinh Viên' : 'Thêm Sinh Viên Mới'}
@@ -69,7 +75,7 @@ const StudentForm = ({ onSubmit, editingStudent, onCancel, onOpenImport }) => {
               name="major" 
               value={formData.major} 
               onChange={handleChange}
-              style={{ padding: '0.75rem 1rem', background: 'rgba(15, 23, 42, 0.5)', border: '1px solid var(--surface-border)', borderRadius: '8px', color: 'var(--text-main)', outline: 'none', fontFamily: 'inherit' }}
+              style={{ padding: '0.75rem 1rem', background: 'var(--input-bg)', border: '1px solid var(--surface-border)', borderRadius: '8px', color: 'var(--text-main)', outline: 'none', fontFamily: 'inherit' }}
             >
               <option value="" disabled>-- Chọn chuyên ngành --</option>
               <option value="Công nghệ thông tin">Công nghệ thông tin</option>
@@ -98,7 +104,7 @@ const StudentForm = ({ onSubmit, editingStudent, onCancel, onOpenImport }) => {
           </button>
         </div>
       </form>
-    </div>
+    </motion.div>
   );
 };
 
