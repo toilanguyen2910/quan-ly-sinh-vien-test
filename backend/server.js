@@ -2,11 +2,16 @@ const express = require('express');
 const cors = require('cors');
 const supabase = require('./database');
 
+const { login, authMiddleware } = require('./auth');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
+
+// API: Đăng nhập
+app.post('/api/auth/login', login);
 
 // API: Lấy danh sách tất cả sinh viên
 app.get('/api/students', async (req, res) => {
@@ -21,8 +26,8 @@ app.get('/api/students', async (req, res) => {
   res.json(data);
 });
 
-// API: Thêm sinh viên mới
-app.post('/api/students', async (req, res) => {
+// API: Thêm sinh viên mới (Yêu cầu Admin)
+app.post('/api/students', authMiddleware, async (req, res) => {
   const { studentCode, fullName, email, phone, major, gpa } = req.body;
   
   const { data, error } = await supabase
@@ -37,8 +42,8 @@ app.post('/api/students', async (req, res) => {
   res.status(201).json(data);
 });
 
-// API: Sửa thông tin sinh viên
-app.put('/api/students/:id', async (req, res) => {
+// API: Sửa thông tin sinh viên (Yêu cầu Admin)
+app.put('/api/students/:id', authMiddleware, async (req, res) => {
   const { studentCode, fullName, email, phone, major, gpa } = req.body;
   
   const { data, error } = await supabase
@@ -53,8 +58,8 @@ app.put('/api/students/:id', async (req, res) => {
   res.json({ message: 'Student updated', changes: data ? data.length : 0 });
 });
 
-// API: Xóa sinh viên
-app.delete('/api/students/:id', async (req, res) => {
+// API: Xóa sinh viên (Yêu cầu Admin)
+app.delete('/api/students/:id', authMiddleware, async (req, res) => {
   const { data, error } = await supabase
     .from('students')
     .delete()

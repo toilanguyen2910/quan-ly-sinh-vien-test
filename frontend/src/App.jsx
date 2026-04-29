@@ -7,6 +7,7 @@ import StudentDetail from './components/StudentDetail';
 import ImportExcel from './components/ImportExcel';
 import ConfirmModal from './components/ConfirmModal';
 import ThemeToggle from './components/ThemeToggle';
+import Login from './components/Login';
 import { getStudents, createStudent, updateStudent, deleteStudent } from './api';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -19,6 +20,11 @@ function App() {
   const [updateTrigger, setUpdateTrigger] = useState(0);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [showImport, setShowImport] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
+  const [user, setUser] = useState(() => {
+    const saved = localStorage.getItem('adminUser');
+    return saved ? JSON.parse(saved) : null;
+  });
   const [isDark, setIsDark] = useState(() => {
     const saved = localStorage.getItem('theme');
     return saved ? saved === 'dark' : true;
@@ -50,6 +56,11 @@ function App() {
   const triggerUpdate = () => setUpdateTrigger(prev => prev + 1);
 
   const handleAddOrUpdate = async (studentData) => {
+    if (!user) {
+      toast.warning("Vui lòng đăng nhập để thực hiện hành động này!");
+      setShowLogin(true);
+      return;
+    }
     try {
       if (editingStudent) {
         await updateStudent(editingStudent.id, studentData);
@@ -66,7 +77,15 @@ function App() {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminUser');
+    setUser(null);
+    toast.info("Đã đăng xuất");
+  };
+
   const handleImportStudent = async (studentData) => {
+    if (!user) return;
     await createStudent(studentData);
   };
 
@@ -76,6 +95,11 @@ function App() {
   };
 
   const handleDelete = (idOrIds) => {
+    if (!user) {
+      toast.warning("Vui lòng đăng nhập để xóa!");
+      setShowLogin(true);
+      return;
+    }
     setConfirmDelete({ isOpen: true, studentId: idOrIds });
   };
 
@@ -83,11 +107,9 @@ function App() {
     const idOrIds = confirmDelete.studentId;
     try {
       if (Array.isArray(idOrIds)) {
-        // Xóa hàng loạt
         await Promise.all(idOrIds.map(id => deleteStudent(id)));
         toast.success(`Đã xóa ${idOrIds.length} sinh viên!`);
       } else {
-        // Xóa đơn lẻ
         await deleteStudent(idOrIds);
         toast.success("Đã xóa sinh viên!");
       }
@@ -101,6 +123,11 @@ function App() {
   };
 
   const handleEdit = (student) => {
+    if (!user) {
+      toast.warning("Vui lòng đăng nhập để sửa!");
+      setShowLogin(true);
+      return;
+    }
     setEditingStudent(student);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -139,8 +166,17 @@ function App() {
       variants={containerVariants}
     >
       <ToastContainer position="top-right" theme={isDark ? 'dark' : 'light'} />
+      
       <motion.header variants={itemVariants}>
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+          {user ? (
+            <div className="user-profile">
+              <span className="user-badge">Admin</span>
+              <button className="btn-logout" onClick={handleLogout}>Đăng xuất</button>
+            </div>
+          ) : (
+            <button className="btn-login" onClick={() => setShowLogin(true)}>Đăng nhập Admin</button>
+          )}
           <ThemeToggle isDark={isDark} onToggle={() => setIsDark(!isDark)} />
         </div>
         <motion.h1 
@@ -158,22 +194,25 @@ function App() {
           <Dashboard students={students} isLoading={isLoading} />
         </motion.div>
         
-        <motion.div variants={itemVariants}>
-          <StudentForm 
-            onSubmit={handleAddOrUpdate} 
-            editingStudent={editingStudent}
-            onCancel={() => setEditingStudent(null)}
-            onOpenImport={() => setShowImport(true)}
-          />
-        </motion.div>
+        {user && (
+          <motion.div variants={itemVariants}>
+            <StudentForm 
+              onSubmit={handleAddOrUpdate} 
+              editingStudent={editingStudent}
+              onCancel={() => setEditingStudent(null)}
+              onOpenImport={() => setShowImport(true)}
+            />
+          </motion.div>
+        )}
         
         <motion.div variants={itemVariants}>
           <StudentList 
             students={students} 
-            onEdit={handleEdit} 
-            onDelete={handleDelete}
+            onEdit={user ? handleEdit : null} 
+            onDelete={user ? handleDelete : null}
             onViewDetail={handleViewDetail}
             isLoading={isLoading}
+            isAdmin={!!user}
           />
         </motion.div>
       </motion.main>
@@ -185,6 +224,13 @@ function App() {
         )}
         {showImport && (
           <ImportExcel onImport={handleImportStudent} onClose={handleImportClose} />
+        )}
+        {showLogin && (
+          <Login 
+            isOpen={showLogin} 
+            onClose={() => setShowLogin(false)} 
+            onLoginSuccess={(userData) => setUser(userData)} 
+          />
         )}
         <ConfirmModal 
           isOpen={confirmDelete.isOpen}
