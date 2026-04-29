@@ -143,10 +143,10 @@ const StudentList = ({ students, onEdit, onDelete, onViewDetail, isLoading }) =>
             style={{ padding: '0.5rem 1rem', background: 'var(--input-bg)', border: '1px solid var(--surface-border)', borderRadius: '8px', color: 'var(--text-main)', outline: 'none' }}
           >
             <option value="All">Mọi điểm số</option>
-            <option value="high">Xuất sắc (>= 3.6)</option>
+            <option value="high">Xuất sắc (&ge; 3.6)</option>
             <option value="good">Giỏi (3.2 - 3.59)</option>
             <option value="average">Khá (2.5 - 3.19)</option>
-            <option value="low">Cần lưu ý (< 2.5)</option>
+            <option value="low">Cần lưu ý (&lt; 2.5)</option>
           </select>
 
           <div style={{ display: 'flex', gap: '0.5rem' }}>
