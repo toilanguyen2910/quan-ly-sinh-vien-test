@@ -127,9 +127,9 @@ const StudentList = ({ students, onEdit, onDelete, onViewDetail, isLoading, isAd
         </div>
       </div>
 
-      <div className="table-container">
+      <div className="table-container" style={{ maxHeight: 'calc(100vh - 400px)', overflowY: 'auto' }}>
         <table>
-          <thead>
+          <thead style={{ position: 'sticky', top: 0, zIndex: 5, background: 'var(--bg-main)' }}>
             <tr>
               {isAdmin && (
                 <th style={{ width: '40px' }}>
@@ -148,7 +148,15 @@ const StudentList = ({ students, onEdit, onDelete, onViewDetail, isLoading, isAd
             <AnimatePresence mode="popLayout">
               {processedStudents.length === 0 ? (
                 <motion.tr initial={{ opacity: 0 }} animate={{ opacity: 1 }} key="empty">
-                  <td colSpan={isAdmin ? "7" : "6"} style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>Không tìm thấy sinh viên nào.</td>
+                  <td colSpan={isAdmin ? "7" : "6"}>
+                    <div className="empty-state">
+                      <div className="empty-state-icon">
+                        <Search size={48} />
+                      </div>
+                      <h3 style={{ color: 'var(--text-main)', marginBottom: '0.5rem' }}>Không tìm thấy kết quả</h3>
+                      <p>Thử thay đổi từ khóa tìm kiếm hoặc bộ lọc để xem thêm.</p>
+                    </div>
+                  </td>
                 </motion.tr>
               ) : (
                 processedStudents.map((student) => (

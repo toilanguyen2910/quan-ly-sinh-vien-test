@@ -170,53 +170,65 @@ function App() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        <header style={{ marginBottom: '3rem', textAlign: 'center' }}>
-          <h1 className="title-gradient">Hệ Thống Quản Lý Sinh Viên</h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', maxWidth: '600px', margin: '0 auto' }}>
+        <header style={{ marginBottom: '3.5rem', textAlign: 'center' }}>
+          <h1 className="title-gradient" style={{ fontSize: '3rem', marginBottom: '1rem' }}>Hệ Thống Quản Lý Sinh Viên</h1>
+          <p style={{ color: 'var(--text-muted)', fontSize: '1.15rem', maxWidth: '700px', margin: '0 auto', lineHeight: 1.6 }}>
             Nền tảng quản trị dữ liệu sinh viên thông minh, hiện đại và bảo mật cao
           </p>
         </header>
 
-        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '1.25rem', marginBottom: '2.5rem' }}>
           {user ? (
             <motion.div 
               className="glass" 
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              style={{ padding: '0.6rem 1.25rem', display: 'flex', alignItems: 'center', gap: '1.25rem' }}
+              initial={{ x: 20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              style={{ padding: '0.6rem 1.25rem', display: 'flex', alignItems: 'center', gap: '1.25rem', border: '1px solid var(--glass-border)' }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <div style={{ width: '36px', height: '36px', borderRadius: '12px', background: 'linear-gradient(135deg, var(--primary), var(--secondary))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold', boxShadow: '0 4px 12px rgba(99, 102, 241, 0.3)' }}>
-                  A
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <div style={{ 
+                  width: '40px', 
+                  height: '40px', 
+                  borderRadius: '14px', 
+                  background: 'linear-gradient(135deg, var(--primary), var(--secondary))', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  color: 'white', 
+                  fontWeight: 800, 
+                  boxShadow: '0 4px 15px rgba(99, 102, 241, 0.4)',
+                  fontSize: '1.1rem'
+                }}>
+                  {user.username ? user.username[0].toUpperCase() : 'A'}
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <span style={{ fontWeight: 700, fontSize: '0.9rem', lineHeight: 1 }}>Quản trị viên</span>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Online</span>
+                  <span style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-main)' }}>{user.username || 'Quản trị viên'}</span>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--success)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                    <span style={{ width: '6px', height: '6px', background: 'var(--success)', borderRadius: '50%' }}></span> Trực tuyến
+                  </span>
                 </div>
               </div>
-              <div style={{ width: '1px', height: '24px', background: 'var(--surface-border)' }}></div>
+              <div style={{ width: '1px', height: '28px', background: 'var(--glass-border)' }}></div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                 <button 
                   className="btn-icon" 
                   onClick={() => setShowActivityLog(true)} 
                   title="Nhật ký hoạt động"
-                  style={{ background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(236, 72, 153, 0.1))' }}
+                  style={{ width: '40px', height: '40px' }}
                 >
-                  <History size={18} style={{ color: 'var(--primary)' }} />
+                  <History size={18} />
                 </button>
                 <button 
                   onClick={handleLogout}
-                  className="btn-logout"
+                  className="btn"
                   style={{ 
                     background: 'rgba(239, 68, 68, 0.1)', 
                     border: '1px solid rgba(239, 68, 68, 0.2)', 
                     color: 'var(--danger)', 
-                    fontWeight: 700, 
-                    cursor: 'pointer', 
                     fontSize: '0.85rem', 
-                    padding: '0.5rem 1rem',
+                    padding: '0.6rem 1.25rem',
                     borderRadius: '12px',
-                    transition: 'all 0.2s ease'
+                    height: '40px'
                   }}
                 >
                   Đăng xuất

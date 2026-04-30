@@ -109,35 +109,71 @@ const Dashboard = ({ students, isLoading }) => {
         </motion.div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
-        <motion.div className="glass" variants={cardVariants} style={{ padding: '1.5rem', height: '300px' }}>
-          <h3 style={{ marginBottom: '1rem', fontSize: '1.1rem', color: 'var(--text-muted)' }}>Tỷ Lệ Chuyên Ngành</h3>
-          {stats.majorData.length > 0 ? (
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie data={stats.majorData} innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
-                  {stats.majorData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip contentStyle={{ background: '#1e293b', border: 'none', borderRadius: '8px', color: 'white' }} />
-              </PieChart>
-            </ResponsiveContainer>
-          ) : (
-            <p style={{ color: 'var(--text-muted)' }}>Chưa có dữ liệu</p>
-          )}
+      <div className="dashboard-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
+        <motion.div className="glass" variants={cardVariants} style={{ padding: '2rem', height: '360px', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ marginBottom: '1.5rem' }}>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <PieChart size={18} style={{ color: 'var(--secondary)' }} /> Phân Bổ Theo Ngành
+            </h3>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Tỷ lệ sinh viên giữa các khoa</p>
+          </div>
+          <div style={{ flexGrow: 1, minHeight: 0 }}>
+            {stats.majorData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie 
+                    data={stats.majorData} 
+                    innerRadius={60} 
+                    outerRadius={80} 
+                    paddingAngle={5} 
+                    dataKey="value"
+                    animationBegin={200}
+                    animationDuration={1200}
+                  >
+                    {stats.majorData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    contentStyle={{ background: 'var(--bg-main)', border: '1px solid var(--glass-border)', borderRadius: '12px', color: 'var(--text-main)', boxShadow: 'var(--shadow)' }} 
+                    itemStyle={{ fontSize: '0.9rem' }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="empty-state" style={{ padding: '2rem' }}>
+                <p>Chưa có dữ liệu sinh viên</p>
+              </div>
+            )}
+          </div>
         </motion.div>
 
-        <motion.div className="glass" variants={cardVariants} style={{ padding: '1.5rem', height: '300px' }}>
-          <h3 style={{ marginBottom: '1rem', fontSize: '1.1rem', color: 'var(--text-muted)' }}>Phổ Điểm GPA</h3>
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={stats.gpaData}>
-              <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
-              <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} allowDecimals={false} />
-              <Tooltip cursor={{ fill: 'rgba(255,255,255,0.05)' }} contentStyle={{ background: '#1e293b', border: 'none', borderRadius: '8px', color: 'white' }} />
-              <Bar dataKey="count" fill="#6366f1" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+        <motion.div className="glass" variants={cardVariants} style={{ padding: '2rem', height: '360px', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ marginBottom: '1.5rem' }}>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <BarChart size={18} style={{ color: 'var(--primary)' }} /> Thống Kê Học Lực
+            </h3>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Phân bố sinh viên theo phổ điểm GPA</p>
+          </div>
+          <div style={{ flexGrow: 1, minHeight: 0 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={stats.gpaData}>
+                <XAxis dataKey="name" stroke="var(--text-muted)" fontSize={11} tickLine={false} axisLine={false} />
+                <YAxis stroke="var(--text-muted)" fontSize={11} tickLine={false} axisLine={false} allowDecimals={false} />
+                <Tooltip 
+                  cursor={{ fill: 'rgba(255,255,255,0.05)' }} 
+                  contentStyle={{ background: 'var(--bg-main)', border: '1px solid var(--glass-border)', borderRadius: '12px', color: 'var(--text-main)', boxShadow: 'var(--shadow)' }} 
+                />
+                <Bar 
+                  dataKey="count" 
+                  fill="var(--primary)" 
+                  radius={[6, 6, 0, 0]} 
+                  animationBegin={400}
+                  animationDuration={1500}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </motion.div>
       </div>
     </motion.div>

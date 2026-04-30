@@ -368,6 +368,122 @@ tr.clickable-row:hover td {
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
+/* Login Modal Specifics */
+.login-modal {
+  width: 400px;
+  padding: 2.5rem;
+  background: var(--bg-main);
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.login-header h2 {
+  font-size: 1.75rem;
+  background: linear-gradient(to right, #818cf8, #f472b6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 0.5rem;
+}
+
+.login-header p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.login-actions {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+/* Activity Modal Specifics */
+.activity-modal {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid var(--surface-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.log-list {
+  padding: 1.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.log-item {
+  transition: transform 0.2s ease;
+}
+
+.log-item:hover {
+  transform: translateX(5px);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Import Excel Specifics */
+.drop-zone {
+  border: 2px dashed var(--surface-border);
+  border-radius: 20px;
+  padding: 3rem 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: rgba(99, 102, 241, 0.02);
+}
+
+.drop-zone:hover, .drop-zone.active {
+  border-color: var(--primary);
+  background: rgba(99, 102, 241, 0.08);
+  transform: scale(1.01);
+}
+
+/* Empty States */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.empty-state-icon {
+  margin-bottom: 1.5rem;
+  opacity: 0.5;
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 /* Student Detail Modal Specifics */
 .student-detail-modal {
   padding: 2.5rem;
